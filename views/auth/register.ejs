@@ -1,6 +1,8 @@
 <%- include('../include/header') %>
 
   <div class="container">
+    <%- include('../include/partials/responseMessage') %>
+
     <form action="/api/register" method="POST" class="flex-center-column auth-form">
       <h1 class="flex-center-row">Register<img src="/assets/icons/user-plus.svg" alt="User"></h1>
       <div class="input-group">
@@ -10,7 +12,7 @@
 
       <div class="input-group">
         <label>Email</label>
-        <input type="email" name="Email" placeholder="Enter your email" >
+        <input type="email" name="email" placeholder="Enter your email" >
       </div>
 
       <div class="input-group">
@@ -27,5 +29,7 @@
       <button type="submit" name="submit">Submit</button>
     </form>
   </div>
+
+  <script src="js/responseMessage.js"></script>
   
 <%- include('../include/footer') %>
