@@ -9,10 +9,11 @@ dotenv.config();
 
 const jwtSecret = process.env.JWT_SECRET || 'MY_SECRET';
 
-const PASSWORD_NOT_MATCH = 'Passwords do not match!';
 const EXIST_USER = 'Username or email is already taken!';
 const RETRY_MESSAGE = 'The server went wrong. Retry again, please.';
 const REGISTER_SUCCESS = 'You have registered successfully.';
+const INCORRECT_USER = "Email or password is incorrect.";
+const LOGIN_SUCCESS = 'You have logged in successfully.';
 
 exports.register = (req, res) => {
   try {
@@ -44,7 +45,7 @@ exports.register = (req, res) => {
           if (err) throw err;
 
           if (result.length === 0) {
-            return res.redirect(`/?error=${RETRY_MESSAGE}`);
+            return res.redirect(`/register?error=${RETRY_MESSAGE}`);
           }
 
           let userId = result[0].id;
@@ -84,6 +85,76 @@ exports.register = (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.redirect(`/?error=${RETRY_MESSAGE}`);
+    return res.redirect(`/register?error=${RETRY_MESSAGE}`);
   }
 };
+
+exports.login = (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.redirect('/login?error=' + errors.array()[0].msg);
+    }
+
+    const { email, password } = req.body;
+    let query = "SELECT * FROM users WHERE email = ?";
+    db.execute(query, [email], async (err, result) => {
+      if (err) {
+        throw err;
+      }
+
+      if (result.length === 0) {
+        return res.redirect(`/login?error=${INCORRECT_USER}`);
+      }
+
+      let user = result[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.redirect(`/login?error=${INCORRECT_USER}`);
+      }
+
+      query = "SELECT user_rank, user_points FROM user_info WHERE user_id = ?";
+      db.execute(query, [user.id], (err, result) => {
+        if (err) {
+          throw err;
+        }
+
+        let userInfo = result[0];
+        const payload = {
+          id: user.id,
+          username: user.username,
+          email
+        };
+
+        jwt.sign(payload, jwtSecret, (err, token) => {
+          if (err) throw err;
+
+          res.cookie('token', token, {
+            maxAge: 1000 * 60 * 60 * 24 * 30 * 6,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+          });
+          res.cookie('user_rank', userInfo.user_rank, {
+            maxAge: 1000 * 60 * 60 * 24 * 30 * 6,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+          });
+          res.cookie('user_points', userInfo.user_points, {
+            maxAge: 1000 * 60 * 60 * 24 * 30 * 6,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+          });
+
+          res.redirect(`/?success=${LOGIN_SUCCESS}`);
+        })
+      })
+    })
+  } catch (error) {
+    console.log(error);
+    res.redirect(`/login?error=${RETRY_MESSAGE}`)
+  }
+}
