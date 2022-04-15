@@ -35,12 +35,7 @@ app.use('/', viewRoutes);
 app.use('/api', userRoutes);
 
 const io = socketIO(server);
-io.on('connection', (socket) => {
-  socket.on("hello", (name) => {
-    console.log("Hello " + name);
-    socket.emit("hello", name);
-  })
-});
+io.on('connection', (socket) => {});
 
 const PORT = process.env.PORT || 5000;
 
