@@ -12,8 +12,9 @@ const jwtSecret = process.env.JWT_SECRET || 'MY_SECRET';
 const EXIST_USER = 'Username or email is already taken!';
 const RETRY_MESSAGE = 'The server went wrong. Retry again, please.';
 const REGISTER_SUCCESS = 'You have registered successfully.';
-const INCORRECT_USER = "Email or password is incorrect.";
+const INCORRECT_USER = 'Email or password is incorrect.';
 const LOGIN_SUCCESS = 'You have logged in successfully.';
+const USER_NOT_FOUND = 'User not found.';
 
 exports.register = (req, res) => {
   try {
@@ -98,7 +99,7 @@ exports.login = (req, res) => {
     }
 
     const { email, password } = req.body;
-    let query = "SELECT * FROM users WHERE email = ?";
+    let query = 'SELECT * FROM users WHERE email = ?';
     db.execute(query, [email], async (err, result) => {
       if (err) {
         throw err;
@@ -114,7 +115,7 @@ exports.login = (req, res) => {
         return res.redirect(`/login?error=${INCORRECT_USER}`);
       }
 
-      query = "SELECT user_rank, user_points FROM user_info WHERE user_id = ?";
+      query = 'SELECT user_rank, user_points FROM user_info WHERE user_id = ?';
       db.execute(query, [user.id], (err, result) => {
         if (err) {
           throw err;
@@ -124,7 +125,7 @@ exports.login = (req, res) => {
         const payload = {
           id: user.id,
           username: user.username,
-          email
+          email,
         };
 
         jwt.sign(payload, jwtSecret, (err, token) => {
@@ -150,11 +151,34 @@ exports.login = (req, res) => {
           });
 
           res.redirect(`/?success=${LOGIN_SUCCESS}`);
-        })
-      })
-    })
+        });
+      });
+    });
   } catch (error) {
     console.log(error);
-    res.redirect(`/login?error=${RETRY_MESSAGE}`)
+    res.redirect(`/login?error=${RETRY_MESSAGE}`);
   }
-}
+};
+
+exports.getInfo = (req, res) => {
+  try {
+    jwt.verify(req.cookies.token, jwtSecret, (err, userPayload) => {
+      if (err) throw err;
+
+      const { id, email, username } = userPayload;
+
+      let user = {
+        id,
+        username,
+        email,
+        user_rank: req.cookies.user_rank,
+        user_points: req.cookies.user_points,
+      };
+
+      return res.json(user);
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};

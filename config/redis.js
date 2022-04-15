@@ -7,7 +7,7 @@ const host = process.env.REDIS_HOST || 'localhost';
 let redisClient;
 
 (async () => {
-  redisClient = redis.createClient({ port: 6379, host });
+  redisClient = redis.createClient({ port: 6379, host, legacyMode: true });
   redisClient.on('error', (err) => {
     console.log(err);
     process.exit(1);

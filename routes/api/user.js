@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { register, login } = require('../../controllers/api/user');
+const { register, login, getInfo } = require('../../controllers/api/user');
 const router = Router();
 
 const USERNAME_REQUIRED = 'Username is required.';
@@ -37,5 +37,7 @@ router.post(
   ],
   login
 );
+
+router.get("/user-info", getInfo);
 
 module.exports = router;
