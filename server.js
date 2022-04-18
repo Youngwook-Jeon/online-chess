@@ -43,7 +43,6 @@ io.on('connection', (socket) => {
     } else {
       newUser(socket.id, user);
     }
-    console.log(user.id);
   });
 
   socket.on('send-total-rooms-and-users', () => {
@@ -82,6 +81,14 @@ io.on('connection', (socket) => {
       });
     });
   });
+
+  socket.on("send-message", (message, user, roomId=null) => {
+    if (roomId) {
+      socket.to(roomId).emit("receive-message", message, user);
+    } else {
+      socket.broadcast.emit("receive-message", message, user, true);
+    }
+  })
 
   socket.on('disconnect', () => {
     let socketId = socket.id;
