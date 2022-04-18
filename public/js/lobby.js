@@ -22,7 +22,7 @@ const fetchUserCallback = (data) => {
   rank.innerText = user.user_rank;
   points.innerText = user.user_points;
 
-  // TODO: Hide Spinner
+  hideSpinner();
 };
 
 fetchData('/api/user-info', fetchUserCallback);
