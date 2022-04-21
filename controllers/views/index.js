@@ -18,3 +18,10 @@ exports.getLobbyPage = (req, res) => {
   }
   res.render('lobby');
 };
+
+exports.getGamesPage = (req, res) => {
+  if (!req.cookies.token) {
+    return res.redirect('/login');
+  }
+  res.render('games');
+};
