@@ -1,6 +1,6 @@
 const gamesDivElement = document.getElementById('games');
 const rankFilter = document.getElementById('filter');
-const gameList = document.getElementById('game-list');
+const gamesList = document.getElementById('games-list');
 const noGameMessage = document.getElementById('no-games-message');
 
 const createRoomBtn = document.getElementById('create-room');
@@ -42,4 +42,66 @@ const fetchUserCallback = (data) => {
   hideSpinner();
 };
 
-fetchData("/api/user-info", fetchUserCallback);
+const addJoinButtonListeners = () => {
+  document.querySelectorAll('.game button').forEach((button) => {
+    if (!button.classList.contains('disabled')) {
+      button.addEventListener('click', (e) => {
+        let game = button.parentNode;
+
+        if (game.dataset.withpassword === 'true') {
+          gameId = game.id;
+          joinRoomFormContainer.classList.remove('hidden');
+        } else {
+          socket.emit('join-room', game.id, user);
+        }
+      });
+    }
+  });
+};
+
+const displayRooms = (rooms) => {
+  gamesList.innerHTML = '';
+
+  rooms.forEach((room) => {
+    let { username, user_rank } = room.players[0];
+    let numberOfPlayersInRoom = room.players[1] ? 2 : 1;
+    let hasPassword = room.password && room.password !== '' ? true : false;
+
+    gamesList.innerHTML += `
+      <li class='game' id = '${room.id}' data-withpassword='${hasPassword}'>
+        <div class="user">
+          <span>${username}</span>
+          <span>(${
+            user_rank.charAt(0).toUpperCase() + user_rank.slice(1)
+          })</span>
+        </div>
+
+        <div class="users-in-room">${numberOfPlayersInRoom} / 2</div>
+
+        <button ${
+          numberOfPlayersInRoom === 2 ? "class='disabled'" : ''
+        }>Join</button>
+      </li>
+    `;
+  });
+
+  addJoinButtonListeners();
+};
+
+fetchData('/api/user-info', fetchUserCallback);
+
+socket.on('receive-rooms', (rooms) => {
+  if (rooms.length > 0) {
+    noGameMessage.classList.add('hidden');
+    gamesList.classList.remove('hidden');
+
+    displayRooms(rooms);
+  } else {
+    gamesList.classList.add('hidden');
+    noGameMessage.classList.remove('hidden');
+  }
+});
+
+rankFilter.addEventListener('change', (e) => {
+  socket.emit('get-rooms', e.target.value);
+});

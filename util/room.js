@@ -107,12 +107,12 @@ const joinRoom = (roomId, user) => {
 const removeRoom = (roomId, userRank) => {
   redisClient.del(roomId);
 
-  redisClient.get("roomIndices", (err, reply) => {
+  redisClient.get('roomIndices', (err, reply) => {
     if (err) throw err;
 
     if (reply) {
       let roomIndices = JSON.parse(reply);
-      redisClient.get("rooms", (err, reply) => {
+      redisClient.get('rooms', (err, reply) => {
         if (err) throw err;
 
         if (reply) {
@@ -120,12 +120,12 @@ const removeRoom = (roomId, userRank) => {
           rooms.splice(roomIndices[roomId], 1);
           delete roomIndices[roomId];
 
-          redisClient.set("rooms", JSON.stringify(rooms));
-          redisClient.set("roomIndices", JSON.stringify(roomIndices));
+          redisClient.set('rooms', JSON.stringify(rooms));
+          redisClient.set('roomIndices', JSON.stringify(roomIndices));
         }
-      })
+      });
     }
-  })
+  });
 
   redisClient.get('total-rooms', (err, reply) => {
     if (err) throw err;
@@ -134,7 +134,7 @@ const removeRoom = (roomId, userRank) => {
       let totalRooms = parseInt(reply);
       totalRooms -= 1;
 
-      redisClient.set("totalRooms", totalRooms + "");
+      redisClient.set('totalRooms', totalRooms + '');
     }
   });
 
@@ -146,8 +146,29 @@ const removeRoom = (roomId, userRank) => {
       numberOfRooms[numberOfRoomIndices[user.user_rank]] -= 1;
       redisClient.set('number-of-rooms', JSON.stringify(numberOfRooms));
     }
-    
   });
-}
+};
 
-module.exports = { createRoom, joinRoom, removeRoom };
+const createTestingRooms = () => {
+  const user1 = {
+    username: 'testuser',
+    user_rank: 'beginner',
+    user_points: 1000,
+    room: 'room1',
+  };
+
+  const user2 = {
+    username: 'testuser2',
+    user_rank: 'expert',
+    user_points: 1000,
+    room: 'room2',
+  };
+
+  createRoom('room1', user1, 0);
+
+  setTimeout(() => {
+    createRoom('room2', user2, 0, 'password');
+  }, 3000);
+};
+
+module.exports = { createRoom, joinRoom, removeRoom, createTestingRooms };
