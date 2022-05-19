@@ -42,6 +42,20 @@ const fetchUserCallback = (data) => {
   hideSpinner();
 };
 
+const handleCreateRoomFormSubmit = (e) => {
+  e.preventDefault();
+  let id = roomId.value;
+  let time = intervals[parseInt(gameTime.value)];
+
+  if (addPassword.checked && roomPassword.value !== '') {
+    socket.emit('create-room', id, time, user, roomPassword.value);
+  } else {
+    socket.emit('create-room', id, time, user);
+  }
+
+  createRoomFormContainer.classList.add('hidden');
+};
+
 const addJoinButtonListeners = () => {
   document.querySelectorAll('.game button').forEach((button) => {
     if (!button.classList.contains('disabled')) {
@@ -102,6 +116,20 @@ socket.on('receive-rooms', (rooms) => {
   }
 });
 
+socket.on('room-created', () => {
+  console.log('Room is created.');
+});
+
 rankFilter.addEventListener('change', (e) => {
   socket.emit('get-rooms', e.target.value);
 });
+
+createRoomBtn.addEventListener('click', () => {
+  createRoomFormContainer.classList.remove('hidden');
+});
+
+closeCreateRoomFormBtn.addEventListener('click', () => {
+  createRoomFormContainer.classList.add('hidden');
+});
+
+createRoomForm.addEventListener('submit', handleCreateRoomFormSubmit);

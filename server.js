@@ -11,7 +11,7 @@ dotenv.config();
 const viewRoutes = require('./routes/views');
 const userRoutes = require('./routes/api/user');
 const { newUser, removeUser } = require('./util/user');
-const { createTestingRooms } = require('./util/room');
+const { createRoom } = require('./util/room');
 
 const app = express();
 
@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
   socket.on('send-total-rooms-and-users', () => {
     redisClient.get('total-users', (err, reply) => {
       if (err) throw err;
-      
+
       let totalUsers = 0;
       let totalRooms = 0;
       let numberOfRooms = [0, 0, 0, 0];
@@ -83,32 +83,51 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on("get-rooms", (rank) => {
-    createTestingRooms();
-    redisClient.get("rooms", (err, reply) => {
+  socket.on('create-room', (roomId, time, user, password = null) => {
+    redisClient.get(roomId, (err, reply) => {
+      if (err) throw err;
+
+      if (reply) {
+        socket.emit('error', `Room with id ${roomId} already exists!`);
+      } else {
+        if (password) {
+          createRoom(roomId, user, time, password);
+        } else {
+          createRoom(roomId, user, time);
+        }
+
+        socket.emit('room-created');
+      }
+    });
+  });
+
+  socket.on('get-rooms', (rank) => {
+    redisClient.get('rooms', (err, reply) => {
       if (err) throw err;
 
       if (reply) {
         let rooms = JSON.parse(reply);
-        if (rank === "all") {
-          socket.emit("receive-rooms", rooms);
+        if (rank === 'all') {
+          socket.emit('receive-rooms', rooms);
         } else {
-          let filteredRooms = rooms.filter(room => room.players[0].user_rank === rank);
-          socket.emit("receive-rooms", filteredRooms);
+          let filteredRooms = rooms.filter(
+            (room) => room.players[0].user_rank === rank
+          );
+          socket.emit('receive-rooms', filteredRooms);
         }
       } else {
-        socket.emit("receive-rooms", []);
+        socket.emit('receive-rooms', []);
       }
-    })
-  })
+    });
+  });
 
-  socket.on("send-message", (message, user, roomId=null) => {
+  socket.on('send-message', (message, user, roomId = null) => {
     if (roomId) {
-      socket.to(roomId).emit("receive-message", message, user);
+      socket.to(roomId).emit('receive-message', message, user);
     } else {
-      socket.broadcast.emit("receive-message", message, user, true);
+      socket.broadcast.emit('receive-message', message, user, true);
     }
-  })
+  });
 
   socket.on('disconnect', () => {
     let socketId = socket.id;

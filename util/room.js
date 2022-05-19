@@ -149,26 +149,26 @@ const removeRoom = (roomId, userRank) => {
   });
 };
 
-const createTestingRooms = () => {
-  const user1 = {
-    username: 'testuser',
-    user_rank: 'beginner',
-    user_points: 1000,
-    room: 'room1',
-  };
+// const createTestingRooms = () => {
+//   const user1 = {
+//     username: 'testuser',
+//     user_rank: 'beginner',
+//     user_points: 1000,
+//     room: 'room1',
+//   };
 
-  const user2 = {
-    username: 'testuser2',
-    user_rank: 'expert',
-    user_points: 1000,
-    room: 'room2',
-  };
+//   const user2 = {
+//     username: 'testuser2',
+//     user_rank: 'expert',
+//     user_points: 1000,
+//     room: 'room2',
+//   };
 
-  createRoom('room1', user1, 0);
+//   createRoom('room1', user1, 0);
 
-  setTimeout(() => {
-    createRoom('room2', user2, 0, 'password');
-  }, 3000);
-};
+//   setTimeout(() => {
+//     createRoom('room2', user2, 0, 'password');
+//   }, 3000);
+// };
 
-module.exports = { createRoom, joinRoom, removeRoom, createTestingRooms };
+module.exports = { createRoom, joinRoom, removeRoom };
