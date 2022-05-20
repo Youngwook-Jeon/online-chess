@@ -11,7 +11,7 @@ dotenv.config();
 const viewRoutes = require('./routes/views');
 const userRoutes = require('./routes/api/user');
 const { newUser, removeUser } = require('./util/user');
-const { createRoom } = require('./util/room');
+const { createRoom, joinRoom } = require('./util/room');
 
 const app = express();
 
@@ -97,6 +97,38 @@ io.on('connection', (socket) => {
         }
 
         socket.emit('room-created');
+      }
+    });
+  });
+
+  socket.on('join-room', (roomId, user, password = null) => {
+    redisClient.get(roomId, (err, reply) => {
+      if (err) throw err;
+
+      if (reply) {
+        let room = JSON.parse(reply);
+        if (room.players[1] === null) {
+          if (room.password && (!password || room.password !== password)) {
+            socket.emit(
+              'error',
+              'To join the room, you need the correct password.'
+            );
+
+            return;
+          }
+
+          joinRoom(roomId, user);
+
+          if (room.password && password !== '') {
+            socket.emit('room-joined', roomId, password);
+          } else {
+            socket.emit('room-joined', roomId);
+          }
+        } else {
+          socket.emit('error', 'The room is full!');
+        }
+      } else {
+        socket.emit('error', `Room with id ${roomId} does not exist!`);
       }
     });
   });
