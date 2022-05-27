@@ -4,7 +4,7 @@ const gamesList = document.getElementById('games-list');
 const noGameMessage = document.getElementById('no-games-message');
 
 const createRoomBtn = document.getElementById('create-room');
-const joinRandomBtn = document.getElementById('join-room');
+const joinRandomBtn = document.getElementById('join-random');
 
 const createRoomFormContainer = document.getElementById(
   'create-room-form-container'
@@ -179,3 +179,7 @@ closeJoinRoomFormBtn.addEventListener('click', () => {
 });
 
 joinRoomForm.addEventListener('submit', handleJoinRoomFormSubmit);
+
+joinRandomBtn.addEventListener('click', () => {
+  socket.emit('join-random', user);
+});
