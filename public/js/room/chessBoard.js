@@ -2,6 +2,9 @@
 // Constant Variables
 // ===================
 
+let player = null;
+let enemy = null;
+
 const lightPieces = [
   {
     position: 'A-8',
