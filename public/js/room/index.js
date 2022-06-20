@@ -31,7 +31,7 @@ let gameDetails = null;
 
 let gameHasTimer = false;
 let timer = null;
-let myTurn = false;
+let myTurn = true;
 let kingIsAttacked = false;
 let pawnToPromotePosition = null;
 let castling = null;
@@ -91,6 +91,82 @@ const displayChessPieces = () => {
       </div>
     `;
   });
+
+  addPieceListeners();
+};
+
+const onClickPiece = (e) => {
+  if (!myTurn || gameOver) {
+    return;
+  }
+
+  hidePossibleMoves()
+
+  let element = e.target.closest('.piece');
+  let position = element.parentNode.id;
+  let piece = element.dataset.piece;
+
+  if (
+    selectedPiece &&
+    selectedPiece.piece === piece &&
+    selectedPiece.position === position
+  ) {
+    hidePossibleMoves()
+    selectedPiece = null;
+    return;
+  }
+
+  selectedPiece = { position, piece };
+
+  let possibleMoves = findPossibleMoves(position, piece);
+
+  showPossibleMoves(possibleMoves);
+};
+
+const addPieceListeners = () => {
+  document.querySelectorAll(`.piece.${player}`).forEach((piece) => {
+    piece.addEventListener('click', onClickPiece);
+  });
+
+  document.querySelectorAll(`.piece.${enemy}`).forEach((piece) => {
+    piece.style.cursor = 'default';
+  });
+};
+
+const showPossibleMoves = (possibleMoves) => {
+  possibleMoves.forEach((box) => {
+    let possibleMoveBox = document.createElement('div');
+    possibleMoveBox.classList.add('possible-move');
+
+    // possibleMoveBox.addEventListener("click", move);
+
+    box.appendChild(possibleMoveBox);
+  });
+};
+
+const hidePossibleMoves = () => {
+  document.querySelectorAll(".possible-move").forEach(possibleMoveBox => {
+    let parent = possibleMoveBox.parentNode;
+    // possibleMoveBox.removeEventListener("click", move);
+    parent.removeChild(possibleMoveBox);
+  })
+}
+
+const findPossibleMoves = (position, piece) => {
+  let splittedPos = position.split('-');
+  let yAxisPos = +splittedPos[1];
+  let xAxisPos = splittedPos[0];
+
+  let yAxisIndex = yAxis.findIndex((y) => y === yAxisPos);
+  let xAxisIndex = xAxis.findIndex((x) => x === xAxisPos);
+
+  switch (piece) {
+    case 'pawn':
+      return getPawnPossibleMoves(xAxisPos, yAxisPos, xAxisIndex, yAxisIndex);
+
+    default:
+      return [];
+  }
 };
 
 const updateTimer = () => {};
