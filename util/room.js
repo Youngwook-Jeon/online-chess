@@ -143,7 +143,7 @@ const removeRoom = (roomId, userRank) => {
 
     if (reply) {
       let numberOfRooms = JSON.parse(reply);
-      numberOfRooms[numberOfRoomIndices[user.user_rank]] -= 1;
+      numberOfRooms[numberOfRoomIndices[userRank]] -= 1;
       redisClient.set('number-of-rooms', JSON.stringify(numberOfRooms));
     }
   });

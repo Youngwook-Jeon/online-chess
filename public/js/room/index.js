@@ -138,7 +138,7 @@ const showPossibleMoves = (possibleMoves) => {
     let possibleMoveBox = document.createElement('div');
     possibleMoveBox.classList.add('possible-move');
 
-    // possibleMoveBox.addEventListener("click", move);
+    possibleMoveBox.addEventListener("click", move);
 
     box.appendChild(possibleMoveBox);
   });
@@ -147,7 +147,7 @@ const showPossibleMoves = (possibleMoves) => {
 const hidePossibleMoves = () => {
   document.querySelectorAll(".possible-move").forEach(possibleMoveBox => {
     let parent = possibleMoveBox.parentNode;
-    // possibleMoveBox.removeEventListener("click", move);
+    possibleMoveBox.removeEventListener("click", move);
     parent.removeChild(possibleMoveBox);
   })
 }
@@ -169,10 +169,16 @@ const findPossibleMoves = (position, piece) => {
   }
 };
 
+// ====================
+// Timer Logic
+// ====================
 const updateTimer = () => {};
 
 const timerEndedCallback = () => {};
 
+// ====================
+// Game Logic
+// ====================
 const setCursor = (cursor) => {
   document.querySelectorAll(`.piece.${player}`).forEach((piece) => {
     piece.getElementsByClassName.cursor = cursor;
@@ -189,6 +195,76 @@ const startGame = (user) => {
 };
 
 displayChessPieces();
+
+// ====================
+// Move Logic
+// ====================
+const move = (e) => {
+  let currentBox = document.getElementById(selectedPiece.position);
+  let boxToMove = e.target.parentNode;
+  let piece = currentBox.querySelector(".piece");
+
+  hidePossibleMoves();
+
+  let pieceToRemove = null;
+  let pieceToRemovePieceImg = null;
+
+  if (boxToMove.children > 0) {
+    if (boxToMove.children[0].classList.contains(player)) {
+      // TODO: Perform castling
+
+      return;
+    }
+
+    pieceToRemove = boxToMove.children[0];
+    pieceToRemovePieceImg = pieceToRemove.children[0];
+  } else {
+    // TODO: Check for castling
+  }
+
+  currentBox.innerHTML = "";
+
+  if (pieceToRemove) {
+    // TODO: Capture piece
+  }
+
+  boxToMove.appendChild(piece);
+
+  let boxesNeededForCheck = {
+    currentBox, boxToMove
+  }
+
+  let piecesNeededForCheck = {
+    piece, pieceToRemove, pieceToRemovePieceImg
+  }
+
+  let isMovePossible = canMakeMove(boxesNeededForCheck, piecesNeededForCheck);
+
+  if (!isMovePossible) {
+    return;
+  }
+
+  // TODO: Check for piece promotion
+
+  // TODO: Check for draw
+
+  // TODO: End my turn
+}
+
+const canMakeMove = ({currentBox, boxToMove}, {piece, pieceToRemove, pieceToRemovePieceImg}) => {
+  // TODO: Check if move is valid
+  let moveIsNotValid = false;
+
+  if (moveIsNotValid) {
+    selectedPiece = null;
+
+    if (pieceToRemove) {
+      // TODO: undo everything
+    }
+  }
+
+  return true;
+}
 
 // ================
 // Socket Listeners
