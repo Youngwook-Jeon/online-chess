@@ -19,18 +19,18 @@ const lightPieces = [
   //   points: 5,
   //   piece: 'rook',
   // },
-  // {
-  //   position: 'B-8',
-  //   icon: '../assets/chess-icons/light/chess-knight-light.svg',
-  //   points: 3,
-  //   piece: 'knight',
-  // },
   {
-    position: 'C-8',
-    icon: '../assets/chess-icons/light/chess-bishop-light.svg',
+    position: 'B-8',
+    icon: '../assets/chess-icons/light/chess-knight-light.svg',
     points: 3,
-    piece: 'bishop',
+    piece: 'knight',
   },
+  // {
+  //   position: 'C-8',
+  //   icon: '../assets/chess-icons/light/chess-bishop-light.svg',
+  //   points: 3,
+  //   piece: 'bishop',
+  // },
   // {
   //   position: 'D-8',
   //   icon: '../assets/chess-icons/light/chess-queen-light.svg',
@@ -43,18 +43,18 @@ const lightPieces = [
     points: 10,
     piece: 'king',
   },
-  {
-    position: 'F-8',
-    icon: '../assets/chess-icons/light/chess-bishop-light.svg',
-    points: 3,
-    piece: 'bishop',
-  },
   // {
-  //   position: 'G-8',
-  //   icon: '../assets/chess-icons/light/chess-knight-light.svg',
+  //   position: 'F-8',
+  //   icon: '../assets/chess-icons/light/chess-bishop-light.svg',
   //   points: 3,
-  //   piece: 'knight',
+  //   piece: 'bishop',
   // },
+  {
+    position: 'G-4',
+    icon: '../assets/chess-icons/light/chess-knight-light.svg',
+    points: 3,
+    piece: 'knight',
+  },
   // {
   //   position: 'H-8',
   //   icon: '../assets/chess-icons/light/chess-rook-light.svg',
@@ -393,7 +393,6 @@ const getRookPossibleMoves = (xAxisPos, yAxisPos, xAxisIndex, yAxisIndex) => {
             possibleMoves.push(rightBlock);
           }
         }
-
       } else {
         rightCollision = true;
       }
@@ -459,11 +458,18 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
   let yInc = 1;
   let xInc = 1;
 
-  while (!topLeftCollision || !topRightCollision || !bottomLeftCollision || !bottomRightCollision) {
+  while (
+    !topLeftCollision ||
+    !topRightCollision ||
+    !bottomLeftCollision ||
+    !bottomRightCollision
+  ) {
     if (!topLeftCollision || !topRightCollision) {
       if (yAxisIndex + yInc < yAxis.length && xAxisIndex - xInc > -1) {
         if (!topLeftCollision) {
-          let topLeftBlock = document.getElementById(`${xAxis[xAxisIndex - xInc]}-${yAxis[yAxisIndex + yInc]}`);
+          let topLeftBlock = document.getElementById(
+            `${xAxis[xAxisIndex - xInc]}-${yAxis[yAxisIndex + yInc]}`
+          );
 
           if (topLeftBlock.childElementCount > 0) {
             if (topLeftBlock.children[0].classList.contains(enemy)) {
@@ -474,14 +480,19 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
           } else {
             possibleMoves.push(topLeftBlock);
           }
-        } 
+        }
       } else {
         topLeftCollision = true;
       }
 
-      if (yAxisIndex + yInc < yAxis.length && xAxisIndex + xInc < xAxis.length) {
+      if (
+        yAxisIndex + yInc < yAxis.length &&
+        xAxisIndex + xInc < xAxis.length
+      ) {
         if (!topRightCollision) {
-          let topRightBlock = document.getElementById(`${xAxis[xAxisIndex + xInc]}-${yAxis[yAxisIndex + yInc]}`);
+          let topRightBlock = document.getElementById(
+            `${xAxis[xAxisIndex + xInc]}-${yAxis[yAxisIndex + yInc]}`
+          );
 
           if (topRightBlock.childElementCount > 0) {
             if (topRightBlock.children[0].classList.contains(enemy)) {
@@ -492,7 +503,7 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
           } else {
             possibleMoves.push(topRightBlock);
           }
-        } 
+        }
       } else {
         topRightCollision = true;
       }
@@ -501,7 +512,9 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
     if (!bottomLeftCollision || !bottomRightCollision) {
       if (yAxisIndex - yInc > -1 && xAxisIndex - xInc > -1) {
         if (!bottomLeftCollision) {
-          let bottomLeftBlock = document.getElementById(`${xAxis[xAxisIndex - xInc]}-${yAxis[yAxisIndex - yInc]}`);
+          let bottomLeftBlock = document.getElementById(
+            `${xAxis[xAxisIndex - xInc]}-${yAxis[yAxisIndex - yInc]}`
+          );
 
           if (bottomLeftBlock.childElementCount > 0) {
             if (bottomLeftBlock.children[0].classList.contains(enemy)) {
@@ -512,14 +525,16 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
           } else {
             possibleMoves.push(bottomLeftBlock);
           }
-        } 
+        }
       } else {
         bottomLeftCollision = true;
       }
 
       if (yAxisIndex - yInc > -1 && xAxisIndex + xInc < xAxis.length) {
         if (!bottomRightCollision) {
-          let bottomRightBlock = document.getElementById(`${xAxis[xAxisIndex + xInc]}-${yAxis[yAxisIndex - yInc]}`);
+          let bottomRightBlock = document.getElementById(
+            `${xAxis[xAxisIndex + xInc]}-${yAxis[yAxisIndex - yInc]}`
+          );
 
           if (bottomRightBlock.childElementCount > 0) {
             if (bottomRightBlock.children[0].classList.contains(enemy)) {
@@ -530,7 +545,7 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
           } else {
             possibleMoves.push(bottomRightBlock);
           }
-        } 
+        }
       } else {
         bottomRightCollision = true;
       }
@@ -541,4 +556,130 @@ const getBishopPossibleMoves = (xAxisIndex, yAxisIndex) => {
   }
 
   return possibleMoves;
-}
+};
+
+const getKnightPossibleMoves = (xAxisIndex, yAxisIndex) => {
+  let possibleMoves = [];
+
+  // Left-up
+  if (xAxisIndex - 2 > -1 && yAxisIndex + 1 < yAxis.length) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex - 2]}-${yAxis[yAxisIndex + 1]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Left-down
+  if (xAxisIndex - 2 > -1 && yAxisIndex - 1 > -1) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex - 2]}-${yAxis[yAxisIndex - 1]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Right-up
+  if (xAxisIndex + 2 < xAxis.length && yAxisIndex + 1 < yAxis.length) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex + 2]}-${yAxis[yAxisIndex + 1]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Right-down
+  if (xAxisIndex + 2 < xAxis.length && yAxisIndex - 1 > -1) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex + 2]}-${yAxis[yAxisIndex - 1]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Up-left
+  if (xAxisIndex - 1 > -1 && yAxisIndex + 2 < yAxis.length) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex - 1]}-${yAxis[yAxisIndex + 2]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Up-right
+  if (xAxisIndex + 1 < xAxis.length && yAxisIndex + 2 < yAxis.length) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex + 1]}-${yAxis[yAxisIndex + 2]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Down-left
+  if (xAxisIndex - 1 > -1 && yAxisIndex - 2 > -1) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex - 1]}-${yAxis[yAxisIndex - 2]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  // Down-right
+  if (xAxisIndex + 1 < xAxis.length && yAxisIndex - 2 > -1) {
+    let block = document.getElementById(
+      `${xAxis[xAxisIndex + 1]}-${yAxis[yAxisIndex - 2]}`
+    );
+
+    if (block.childElementCount > 0) {
+      if (block.children[0].classList.contains(enemy)) {
+        possibleMoves.push(block);
+      }
+    } else {
+      possibleMoves.push(block);
+    }
+  }
+
+  return possibleMoves;
+};

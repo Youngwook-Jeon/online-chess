@@ -169,6 +169,9 @@ const findPossibleMoves = (position, piece) => {
       
     case 'bishop':
       return getBishopPossibleMoves(xAxisIndex, yAxisIndex);
+
+    case 'knight':
+      return getKnightPossibleMoves(xAxisIndex, yAxisIndex);
     default:
       return [];
   }
