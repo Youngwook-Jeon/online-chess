@@ -211,6 +211,19 @@ const startGame = (user) => {
   displayChessPieces();
 };
 
+const endMyTurn = (newPieceBox, pawnPromoted=false, castlingPerformed=false, enPassantPerformed=false) => {
+  if (kingIsAttacked) {
+    // setKingIsAttacked(false);
+  }
+
+  myTurn = false;
+  setCursor("default");
+
+  // saveMove(newPieceBox, pawnPromoted, castlingPerformed, enPassantPerformed);
+
+  // checkIfKingIsAttacked(enemy);
+}
+
 displayChessPieces();
 
 // ====================
@@ -243,6 +256,8 @@ const move = (e) => {
 
   if (pieceToRemove) {
     // TODO: Capture piece
+    // capturePiece(pieceToRemove);
+    boxToMove.innerHTML = ""
   }
 
   boxToMove.appendChild(piece);
@@ -265,7 +280,7 @@ const move = (e) => {
 
   // TODO: Check for draw
 
-  // TODO: End my turn
+  endMyTurn(boxToMove);
 }
 
 const canMakeMove = ({currentBox, boxToMove}, {piece, pieceToRemove, pieceToRemovePieceImg}) => {
@@ -281,6 +296,56 @@ const canMakeMove = ({currentBox, boxToMove}, {piece, pieceToRemove, pieceToRemo
   }
 
   return true;
+}
+
+const checkIfKingIsAttacked = (playerToCheck) => {
+  let kingPosition = getKingPosition(playerToCheck);
+
+  let check = isCheck(kingPosition, playerToCheck === player);
+
+  if (check) {
+    if (player !== playerToCheck) {
+      // TODO: Check if this is a checkmate or just check
+    } 
+
+    return true;
+  }
+
+  return false;
+}
+
+const saveMove = (newPieceBox, pawnPromoted, castlingPerformed, enPassantPerformed) => {
+  let move = { from: selectedPiece.position, to: newPieceBox.id, piece: selectedPiece.piece, pieceColor: player}
+
+  selectedPiece = null;
+  pawnToPromotePosition = null;
+
+  if (gameHasTimer) {
+    let currentTime;
+    if (player === 'light') {
+      currentTime = playerLightTimer.innerText;
+    } else {
+      currentTime = playerBlackTimer.innerText;
+    }
+
+    move.time = currentTime;
+
+    timer.stop();
+  }
+
+  if (pawnPromoted) {
+    // TODO: pass the pawn promotion also
+  } else if (castlingPerformed) {
+    // TODO: pass the castling also
+  } else if (enPassantPerformed) {
+    // TODO: pass the en passant also
+  } else {
+    socket.emit("move-made", roomId, move);
+  }
+}
+
+const moveEnemy = (move, pawnPromotion=null, enPassantPerformed=false) => {
+  
 }
 
 // ================

@@ -810,4 +810,104 @@ const getKingPossibleMoves = (xAxisPos, yAxisPos, xAxisIndex, yAxisIndex) => {
   return possibleMoves;
 };
 
-const isCheck = (position) => {};
+const switchPlayerAndEnemy = () => {
+  if (player === 'light') {
+    player = 'black';
+    enemy = 'light';
+  } else {
+    player = 'light';
+    enemy = 'black';
+  }
+}
+
+const isCheck = (kingPosition, position, myKing=true) => {
+  let splittedPos = kingPosition.split("-");
+  let xAxisPos = splittedPos[0];
+  let yAxisPos = +splittedPos[1];
+
+  let xAxisIndex = xAxis.findIndex(x => x === xAxisPos);
+  let yAxisIndex = yAxis.findIndex(y => y === yAxisPos);
+
+  if (!myKing) {
+    switchPlayerAndEnemy()
+  }
+
+  let possibleMoves = Array.prototype.concat(
+    getRookPossibleMoves(xAxisPos, yAxisPos, xAxisIndex, yAxisIndex),
+    getBishopPossibleMoves(xAxisIndex, yAxisIndex),
+    getKnightPossibleMoves(xAxisIndex, yAxisIndex)
+  );
+
+  for (let i = 0; i < possibleMoves.length; i++) {
+    let box = possibleMoves[i];
+
+    if (box.children.length > 0) {
+      let piece = box.children[0];
+
+      let pieceXPos = box.id.split("-")[0];
+      let pieceYPos = +box.id.split("-")[1];
+
+      let pieceXAxisIndex = xAxis.findIndex(x => x === pieceXPos);
+      let pieceYAxisIndex = yAxis.findIndex(y => y === pieceYPos);
+
+      switch (piece.dataset.piece) {
+        case 'pawn':
+          if (enemy === 'light') {
+            if (
+              (pieceXAxisIndex === xAxisIndex - 1 && pieceYAxisIndex === yAxisIndex + 1) ||
+              (pieceXAxisIndex === xAxisIndex + 1 && pieceYAxisIndex === yAxisIndex + 1)
+            ) {
+              if (!myKing) {
+                switchPlayerAndEnemy();
+              }
+
+              return true;
+            }
+          } else {
+            if (
+              (pieceXAxisIndex === xAxisIndex - 1 && pieceYAxisIndex === yAxisIndex - 1) ||
+              (pieceXAxisIndex === xAxisIndex + 1 && pieceYAxisIndex === yAxisIndex - 1)
+            ) {
+              if (!myKing) {
+                switchPlayerAndEnemy();
+              }
+
+              return true;
+            }
+          }
+          break;
+
+        case 'knight':
+          if (
+            (pieceXAxisIndex === xAxisIndex - 1 && pieceYAxisIndex === yAxisIndex + 2) ||
+            (pieceXAxisIndex === xAxisIndex - 1 && pieceYAxisIndex === yAxisIndex - 2) ||
+            (pieceXAxisIndex === xAxisIndex + 1 && pieceYAxisIndex === yAxisIndex + 2) ||
+            (pieceXAxisIndex === xAxisIndex + 1 && pieceYAxisIndex === yAxisIndex - 2) ||
+            (pieceXAxisIndex === xAxisIndex - 2 && pieceYAxisIndex === yAxisIndex + 1) ||
+            (pieceXAxisIndex === xAxisIndex - 2 && pieceYAxisIndex === yAxisIndex - 1) ||
+            (pieceXAxisIndex === xAxisIndex + 2 && pieceYAxisIndex === yAxisIndex + 1) ||
+            (pieceXAxisIndex === xAxisIndex + 2 && pieceYAxisIndex === yAxisIndex - 1)
+          ) {
+            if (!myKing) {
+              switchPlayerAndEnemy();
+            }
+
+            return true;
+          }
+          break;
+      }
+    }
+  }
+};
+
+const isCheckmate = (position) => {};
+
+const getKingPosition = (pieceColor) => {
+  let pieces = document.querySelectorAll(`.piece.${pieceColor}`);
+
+  for (let i = 0; i < pieces.length; i++) {
+    if (pieces[i].dataset.piece === 'king') {
+      return pieces[i].parentNode.id;
+    }
+  }
+};
