@@ -820,7 +820,7 @@ const switchPlayerAndEnemy = () => {
   }
 }
 
-const isCheck = (kingPosition, position, myKing=true) => {
+const isCheck = (kingPosition, myKing=true) => {
   let splittedPos = kingPosition.split("-");
   let xAxisPos = splittedPos[0];
   let yAxisPos = +splittedPos[1];
@@ -895,9 +895,62 @@ const isCheck = (kingPosition, position, myKing=true) => {
             return true;
           }
           break;
+
+        case 'rook':
+          if (pieceXPos === xAxisPos || pieceYPos === yAxisPos) {
+            if (!myKing) {
+              switchPlayerAndEnemy();
+            }
+
+            return true;
+          }
+          break;
+
+        case 'bishop':
+          let xyBlockDiffIsTheSame = Math.abs(xAxisIndex - pieceXAxisIndex) === Math.abs(yAxisIndex - pieceYAxisIndex);
+
+          if (
+            (pieceXAxisIndex < xAxisIndex && pieceYAxisIndex > yAxisIndex && xyBlockDiffIsTheSame) ||
+            (pieceXAxisIndex < xAxisIndex && pieceYAxisIndex < yAxisIndex && xyBlockDiffIsTheSame) ||
+            (pieceXAxisIndex > xAxisIndex && pieceYAxisIndex > yAxisIndex && xyBlockDiffIsTheSame) ||
+            (pieceXAxisIndex > xAxisIndex && pieceYAxisIndex < yAxisIndex && xyBlockDiffIsTheSame)
+          ) {
+            if (!myKing) {
+              switchPlayerAndEnemy();
+            }
+
+            return true;
+          }
+          break;
+
+        case 'queen':
+          let xyBlockDiff = Math.abs(xAxisIndex - pieceXAxisIndex) === Math.abs(yAxisIndex - pieceYAxisIndex);
+          if (
+            (pieceXPos === xAxisPos || pieceYPos === yAxisPos) ||
+            (pieceXAxisIndex < xAxisIndex && pieceYAxisIndex > yAxisIndex && xyBlockDiff) ||
+            (pieceXAxisIndex < xAxisIndex && pieceYAxisIndex < yAxisIndex && xyBlockDiff) ||
+            (pieceXAxisIndex > xAxisIndex && pieceYAxisIndex > yAxisIndex && xyBlockDiff) ||
+            (pieceXAxisIndex > xAxisIndex && pieceYAxisIndex < yAxisIndex && xyBlockDiff)
+          ) {
+            if (!myKing) {
+              switchPlayerAndEnemy();
+            }
+
+            return true;
+          }
+          break;
+
+        default:
+          break;
       }
     }
   }
+
+  if (!myKing) {
+    switchPlayerAndEnemy();
+  }
+
+  return false;
 };
 
 const isCheckmate = (position) => {};
